@@ -98,6 +98,17 @@
 .lc-chart[data-catdim='tool'] .lc-cat-seg[data-cat='tool'] { opacity: 1; filter: brightness(1.18); }
 .lc-bar-marker { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--dsw-alias-state-warn-primary); }
 /*
+ Step flags (step granularity only): every 5th bar plants a flag at its RIGHT edge — a 1px pole rising from
+ the baseline into the chart's 18px top padding band, the cumulative step number boxed at the pole's top,
+ extending LEFT (a left-streaming banner over its own bar; the opaque background covers the pole's upper
+ end, so the pair reads as one flag). Decorative and pointer-transparent, and outside the animated stacks
+ so the entrance rise leaves it standing. The banner never contributes to scrollable overflow: rightward it
+ ends AT the pole, and the first flag lands 4 columns in (pole at 79px), wider than any label's reach
+ leftward. Renders BEFORE the ✂ marker so the event glyph paints on top on a same-bar collision.
+ */
+.lc-step-flag { position: absolute; right: -1px; top: -17px; bottom: 0; width: 1px; background: color-mix(in srgb, var(--color-neutral-500) 45%, transparent); pointer-events: none; }
+.lc-step-flag-label { position: absolute; top: 0; right: 0; box-sizing: border-box; padding: 1px 3px; border: 1px solid color-mix(in srgb, var(--color-neutral-500) 45%, transparent); border-radius: 3px; background: var(--dsw-alias-bg-layer-1); font-size: 9px; line-height: 1; font-weight: 600; color: var(--dsw-alias-label-secondary); white-space: nowrap; }
+/*
  Turn strip: NEUTRAL zebra fills (inline, see TURN_FILLS) — never the category palette, or the strip reads as a detached bottom segment of the bars.
  */
 /* Same sizing as .lc-chart: as an in-flow child of the scroller the strip would otherwise cap at the
