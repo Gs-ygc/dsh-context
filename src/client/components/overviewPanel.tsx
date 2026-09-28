@@ -168,7 +168,9 @@ export function makeOverviewPanel(ctx: ClientCtx, kit: ViewKit): (props: Overvie
           {rows === null ? (
             <div className="lc-empty">{t('ov.unavailable')}</div>
           ) : (
-            <>
+            /* The panel's one scroll region: everything under the head — the
+               KPI band, the stats row, and the 3:7 body — scrolls as one. */
+            <div className="lc-ov-scroll">
               {/* The panel's first row: a 1:1 column pair — the KPI metrics
                   band (the range's six figures, three per row) beside the
                   last-7-days usage chart (per-day tokens + cost bars off the
@@ -335,7 +337,7 @@ export function makeOverviewPanel(ctx: ClientCtx, kit: ViewKit): (props: Overvie
                   )}
                 </div>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>

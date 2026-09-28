@@ -10,10 +10,9 @@
  * card grid).
  * The backdrop is the `lc-ov` query container (it spans the viewport, and
  * the card sizes off the viewport too), so the column fold keys off the
- * viewport width; on the folded width the card itself scrolls in normal
- * flow. Inline-size containment is safe here: the backdrop IS the viewport
- * rectangle, so the heat cells' fixed-position Tooltip bubbles keep their
- * viewport coordinates.
+ * viewport width. Inline-size containment is safe here: the backdrop IS the
+ * viewport rectangle, so the heat cells' fixed-position Tooltip bubbles
+ * keep their viewport coordinates.
  */
 
 /* ---- the sidebar-foot entry ---- */
@@ -36,9 +35,8 @@
    band top and bottom (the width keeps its 16px side frame), so the panel's
    footprint never wobbles with the content. The backdrop is a definite-
    height flex box, so the percentage resolves without viewport units. The
-   body fills the rest and each column scrolls its own overflow, so browsing
-   sessions never scrolls the insight column out of view. On the folded
-   width the card scrolls whole (see the container query at the body). */
+   head stays put; the scroll region fills the rest and is the panel's one
+   scroller — the KPI band, the stats row, and the body scroll as one. */
 .lc-ov-card { display: flex; flex-direction: column; width: min(1120px, calc(100vw - 32px)); height: calc(100% - 80px); overflow: hidden; box-sizing: border-box; background: var(--dsw-alias-bg-layer-1); border: 1px solid var(--dsw-alias-border-l2); border-radius: 12px; box-shadow: var(--dsw-shadow-lv3, 0 12px 32px rgba(0, 0, 0, 0.4)); padding: 16px 18px 18px; color: var(--dsw-alias-label-primary); font-size: 13px; }
 .lc-ov-head { flex: none; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
 .lc-ov-head-icon { flex: none; }
@@ -53,6 +51,13 @@
 .lc-ov-balance-value { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
 .lc-ov-head .lc-modal-close { margin-left: 0; flex: none; }
 
+/* The panel's one scroller: everything under the head. It inherits the
+   scrollbar discipline the columns used to own — the harness 8px bar with a
+   stable gutter, so cards never reflow by the bar's width, and the right
+   padding keeps the thumb clear of the card edges instead of riding on
+   them. */
+.lc-ov-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; padding-right: 8px; }
+
 /* ---- the panel's first row: a 1:1 column pair — the KPI metrics band
    (the range's six figures, three per row — the row pair is the tallened
    first row) beside the last-7-days usage chart, whose card
@@ -61,7 +66,7 @@
    chart's seven day groups would crush); the KPI grid then spreads the
    full width, and drops to 2×3 at 640px (phone), so no cell ever
    ellipsizes its figure. ---- */
-.lc-ov-first { flex: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+.lc-ov-first { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
 .lc-ov-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .lc-ov-kpi { align-items: center; padding: 8px; }
 .lc-ov-kpi .lc-stat-value { font-size: 20px; }
@@ -119,7 +124,7 @@
    column at 700px of container — below the body's own 932px fold, where
    a half (~340px) still fits the donut + one legend column, but narrower
    halves would wrap the legend rows into slivers. ---- */
-.lc-ov-stats { flex: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+.lc-ov-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
 /* The row's cards zero the .lc-card margin like the column's own, and take
    the same border-box (the base .lc-card is content-box; the padding would
    otherwise widen both tracks past the card). */
@@ -129,29 +134,22 @@
 }
 
 /* ---- the body: a 3:7 column pair — the insight column (the heat over the
-   preferences entry) beside the session column; under width pressure it
-   folds to one full-width column and the whole card scrolls in normal flow
-   (no capped inner scrollers to overlap). ---- */
-.lc-ov-body { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 7fr); gap: 10px; }
-/* Each column owns its scrollbar (the harness 8px bar): `scrollbar-gutter:
-   stable` holds the bar's track so cards never reflow by its width when a
-   column gains or loses it, and the right padding keeps the thumb clear of
-   the card edges instead of riding on them. */
-.lc-ov-left { min-height: 0; overflow-y: auto; scrollbar-gutter: stable; padding-right: 8px; display: flex; flex-direction: column; gap: 10px; }
-.lc-ov-right { min-height: 0; overflow-y: auto; scrollbar-gutter: stable; padding-right: 8px; }
+   preferences entry) beside the session column. Neither column scrolls on
+   its own — the panel's `.lc-ov-scroll` owns the one bar — and `align-items:
+   start` keeps each column at its natural height, so the heat card never
+   stretches to the paged grid's height. Under width pressure the pair folds
+   to one full-width column. ---- */
+.lc-ov-body { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 7fr); gap: 10px; align-items: start; }
+.lc-ov-left { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.lc-ov-right { min-width: 0; }
 @container lc-ov (max-width: 932px) {
-  .lc-ov-card { overflow-y: auto; }
   .lc-ov-body { display: block; }
   .lc-ov-left { margin-bottom: 12px; }
-  .lc-ov-left, .lc-ov-right { overflow: visible; min-height: auto; padding-right: 0; }
-  .lc-ov-heat-card { flex: none; }
 }
 /* border-box keeps the card tracks true outer widths: under the harness's
    content-box default the padding quietly adds ~30px per card. */
 .lc-ov-left > .lc-card { margin-bottom: 0; min-width: 0; box-sizing: border-box; }
-/* The heat card absorbs the insight column's leftover height (the grid
-   centers inside it) but never shrinks below its own grid. */
-.lc-ov-heat-card { flex: 1 0 auto; display: flex; flex-direction: column; }
+.lc-ov-heat-card { display: flex; flex-direction: column; }
 /* The preferences entry: one row under the activity card, framed like the
    column's other cards (the session-card hover: border darkens, layer-2
    fill); the hint pulls to the right edge and ellipsizes under width
